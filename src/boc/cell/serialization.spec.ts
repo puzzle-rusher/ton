@@ -66,7 +66,12 @@ describe('boc', () => {
 
     it('should parse accountProof.txt', () => {
         let boc = Buffer.from(fs.readFileSync(__dirname + '/__testdata__/accountProof.txt', 'utf8'), 'base64');
-        let c = deserializeBoc(boc)[0];
+        let boc_cells = deserializeBoc(boc);
+        let root_one_hash = boc_cells[0].hash().toString('hex')
+        let root_two_hash = boc_cells[1].hash().toString('hex')
+        const expected_root_hashes = new Set(['ceb74a112c1d4e53e4bbab30fe1a0153b10ffeaa33a828818dd052eb58004d4a', '1b8709beb7f8fe24f17fec2f477bb77fac399920b0228794a519f9e3961db29c']);
+        expect(new Set([root_one_hash, root_two_hash])).toEqual(expected_root_hashes)
+        let c = boc_cells[0];
         let b = serializeBoc(c, { idx: false, crc32: true });
         let c2 = deserializeBoc(b)[0];
         expect(c2.equals(c)).toBe(true);
